@@ -1,3 +1,4 @@
+from django.conf import settings
 from textwrap import indent
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -17,7 +18,7 @@ load_dotenv()  # load variables from .env
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-openai.api_key = os.getenv('OPENAI_API_KEY')  # API from .env
+openai.api_key = settings.OPENAI_API_KEY
 
 @csrf_exempt
 def Kindergarten(request):

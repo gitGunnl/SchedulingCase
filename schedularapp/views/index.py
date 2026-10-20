@@ -1,10 +1,11 @@
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import openai
 import json
 
 # Set your OpenAI API key in environment or settings
-openai.api_key = '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'
+openai.api_key = settings.OPENAI_API_KEY
 
 # Maximum iterations for refinement
 MAX_ITERATIONS = 5
