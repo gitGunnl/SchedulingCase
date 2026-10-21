@@ -1,10 +1,14 @@
 # Credential and database cleanup
 
-This change removes credentials and runtime files from the proposed branch. Old commits and other branches still contain exposed material. Rotation is required even after merge.
+## Confirmed scope and provider status
 
-## Before merging or pulling on a running service
+The owner confirmed this application is retired on 21 October 2026. The shared OpenAI key, named LearnHub, was already revoked in the provider dashboard. No replacement provider or Django signing credentials, deployment, or live database migration are needed for this retired application. The instructions below apply only if an installation is revived.
 
-1. Identify the running host and branch. GitHub has no deployment records. The public scheduler repository links to PythonAnywhere; that link alone does not prove it is still running. Do not merge into an automatically deployed branch until the remaining steps are complete.
+This change removes credentials and runtime files from the proposed branch. Old commits and other branches still contain exposed material. Provider status is recorded above. Never reuse an exposed signing key in a future installation.
+
+## If reviving or updating an existing installation
+
+1. Identify the running host and branch. GitHub has no deployment records. The former public scheduler link showed a PythonAnywhere Coming Soon placeholder on 21 October 2026. Do not merge into an automatically deployed branch until the remaining steps are complete.
 2. Stop writes and back up the live SQLite database to private storage outside the checkout. A pull that removes a tracked `db.sqlite3` can delete the deployed copy. Use the running service's actual database path, not a newly cloned database. Verify the backup with `PRAGMA integrity_check` and compare table counts locally. Do not publish database contents or backups.
 3. Place a working database copy outside the checkout and configure `DJANGO_DB_PATH` to its absolute path. Preserve the original backup. Verify that the service account can read and write the database and parent directory. For example, while the service is stopped, use Python's SQLite backup API:
 
@@ -26,7 +30,7 @@ This change removes credentials and runtime files from the proposed branch. Old 
 
 4. Set a new, unique `DJANGO_SECRET_KEY` in the server environment. Generate it privately with `python -c "import secrets; print(secrets.token_urlsafe(64))"`. The application deliberately refuses to start with a missing or empty signing key. Replacing it invalidates existing signed sessions and reset links. Do not keep the exposed value in `SECRET_KEY_FALLBACKS`.
 5. Set `OPENAI_API_KEY` to a replacement provider key and `DJANGO_ALLOWED_HOSTS` to the real host names, comma separated. Keep `DJANGO_DEBUG=false` on the live service. The scheduler loads an ignored `.env` beside `manage.py` without overriding existing environment variables.
-6. If the service uses the tracked `.venv`, first build a replacement virtual environment outside the checkout with the existing `requirements.txt`, then update the service interpreter. Git will remove the tracked environment on pull. Deploy, restart, and verify login, existing records and a provider request in a controlled maintenance window. Revoke the exposed provider key and check usage and billing. If abuse is happening, revoke it immediately and accept the temporary outage.
+6. If the service uses the tracked `.venv`, first build a replacement virtual environment outside the checkout with the existing `requirements.txt`, then update the service interpreter. Git will remove the tracked environment on pull. Deploy, restart, and verify login, existing records and a provider request in a controlled maintenance window. The exposed shared OpenAI key is already revoked. Use a fresh key if restarting and review past provider usage privately.
 
 ## New local installation
 
